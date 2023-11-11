@@ -1,28 +1,39 @@
 const dotenv = require("dotenv");
 const path = require("path");
-// 获取npm run dev 后面的参数
-// const args = process.argv.slice(2);
-// let environment = args[0] || "development";
+// require("cross-env")
+function loadEnvironmentFile(environment) {
+    const dotenvPaths = {
+        "development": "../.env.development",
+        "production": "../.env.production"
+    };
+
+    const keys = Object.keys(dotenvPaths);
+    const selectedPath = keys.find(key => environment.includes(key));
+
+    if (selectedPath) {
+        console.log(`selectedPath: ${dotenvPaths[selectedPath]}`);
+        console.log(`正在使用 ${environment} 环境`);
+        dotenv.config({
+            path: path.resolve(__dirname, dotenvPaths[selectedPath])
+        });
+    } else {
+        console.error("未找到对应的环境路径");
+        throw new Error("Invalid environment specified.");
+    }
+}
+
+// 获取环境变量
 const environment = process.env.NODE_ENV.toString();
 console.log("environment", environment);
 
-const dotenvPaths = new Map([
-    ["development", "../.env.development"],
-    ["production", "../.env.production"]
-]);
-
-const selectedPath = dotenvPaths.get(environment);
-console.log("selectedPath",selectedPath)
-if (selectedPath) {
-    console.log(`正在使用 ${environment} 环境`);
-    const dotenv = require("dotenv");
-    const path = require("path");
-    dotenv.config({
-        path: path.resolve(__dirname, selectedPath)
-    });
+// 检查环境并加载对应的环境文件
+if (environment.includes("production")) {
+    try {
+        loadEnvironmentFile(environment);
+    } catch (error) {
+        console.error(error.message);
+    }
 } else {
     console.error("Invalid environment specified.");
 }
-
-
-module.exports = dotenv
+module.exports = {loadEnvironmentFile}
