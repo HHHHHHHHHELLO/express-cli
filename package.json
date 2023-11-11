@@ -1,5 +1,5 @@
 {
-  "name": "express",
+  "name": "express-custom-cli",
   "version": "1.0.0",
   "description": "",
   "main": "bin/www.js",
